@@ -15,7 +15,6 @@ import db.DB;
 import db.DbException;
 import model.dao.DepartmentDao;
 import model.entities.Department;
-import model.entities.Seller;
 
 public class DepartmentDaoJDBC implements DepartmentDao {
 
@@ -27,12 +26,12 @@ public class DepartmentDaoJDBC implements DepartmentDao {
 
 	@Override
 	public void insert(Department obj) {
-		
+
 		PreparedStatement st = null;
 
 		try {
 
-			st = conn.prepareStatement("INSERT INTO DEPARTMENT (NAME) VALUES (?)",Statement.RETURN_GENERATED_KEYS);
+			st = conn.prepareStatement("INSERT INTO DEPARTMENT (NAME) VALUES (?)", Statement.RETURN_GENERATED_KEYS);
 
 			st.setString(1, obj.getName());
 
@@ -69,21 +68,23 @@ public class DepartmentDaoJDBC implements DepartmentDao {
 
 	@Override
 	public void update(Department obj) {
-		
+
 		PreparedStatement st = null;
 
 		try {
 
-			st = conn.prepareStatement("UPDATE department "
-					+ "SET Name = ? WHERE Id = ?");
+			st = conn.prepareStatement("UPDATE department " + "SET Name = ? WHERE Id = ?");
 
 			st.setString(1, obj.getName());
 			st.setInt(2, obj.getId());
 
 			st.executeUpdate();
+			
+			System.out.println("Update completed");
 
 		} catch (SQLException e) {
 
+			System.out.println("Update failed!");
 			throw new DbException(e.getMessage());
 
 		} finally {
@@ -96,7 +97,32 @@ public class DepartmentDaoJDBC implements DepartmentDao {
 
 	@Override
 	public void deleteById(Integer id) {
-		// TODO Auto-generated method stub
+		
+		PreparedStatement st = null;
+
+		try {
+
+			st = conn.prepareStatement("DELETE FROM department " + "WHERE Id = ? ");
+
+			st.setInt(1, id);
+
+			int rowsAffected = st.executeUpdate();
+
+			if (rowsAffected > 0) {
+				System.out.println("Deletion completed!");
+			} else {
+				throw new DbException("No rows were deleted!");
+			}
+
+		} catch (SQLException e) {
+
+			throw new DbException(e.getMessage());
+
+		} finally {
+
+			DB.closeStatement(st);
+
+		}
 
 	}
 
